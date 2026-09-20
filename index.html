@@ -1,0 +1,122 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta
+      name="description"
+      content="Visualize contiguous, linked, and indexed file-system block allocation."
+    />
+    <title>FileAlloc — Block Allocation Visualizer</title>
+    <link rel="stylesheet" href="css/styles.css" />
+  </head>
+  <body>
+    <header class="site-header">
+      <div>
+        <p class="eyebrow">Operating Systems Mini Project</p>
+        <h1>File System Block Allocation Visualizer</h1>
+        <p class="subtitle">
+          Compare contiguous, linked, and indexed allocation on a 64-block disk.
+        </p>
+      </div>
+      <button id="reset-button" class="button button-danger" type="button">
+        Reset simulation
+      </button>
+    </header>
+
+    <main class="app-layout">
+      <section class="control-panel card" aria-labelledby="create-file-heading">
+        <h2 id="create-file-heading">Create file</h2>
+
+        <form id="create-file-form" novalidate>
+          <label for="file-name">File name</label>
+          <input
+            id="file-name"
+            name="fileName"
+            type="text"
+            maxlength="30"
+            placeholder="e.g. report.txt"
+            autocomplete="off"
+            required
+          />
+
+          <label for="file-size">Size (data blocks)</label>
+          <input
+            id="file-size"
+            name="fileSize"
+            type="number"
+            min="1"
+            max="64"
+            step="1"
+            placeholder="e.g. 5"
+            required
+          />
+
+          <label for="allocation-type">Allocation method</label>
+          <select id="allocation-type" name="allocationType">
+            <option value="contiguous">Contiguous Allocation</option>
+            <option value="linked">Linked Allocation</option>
+            <option value="indexed">Indexed Allocation</option>
+          </select>
+
+          <p id="method-help" class="field-help">
+            Requires one consecutive run of free blocks.
+          </p>
+
+          <button class="button button-primary" type="submit">Create file</button>
+        </form>
+
+        <div id="status-message" class="status-message" role="status" aria-live="polite"></div>
+      </section>
+
+      <section class="workspace">
+        <div class="summary-grid" aria-label="Disk usage summary">
+          <article class="summary-card">
+            <span>Total blocks</span>
+            <strong id="total-blocks">64</strong>
+          </article>
+          <article class="summary-card summary-card-used">
+            <span>Used blocks</span>
+            <strong id="used-blocks">0</strong>
+          </article>
+          <article class="summary-card summary-card-free">
+            <span>Free blocks</span>
+            <strong id="free-blocks">64</strong>
+          </article>
+        </div>
+
+        <section class="card" aria-labelledby="disk-heading">
+          <div class="section-heading">
+            <div>
+              <h2 id="disk-heading">Disk blocks</h2>
+              <p>Select a file below to highlight its blocks.</p>
+            </div>
+            <div class="legend" aria-label="Block legend">
+              <span><i class="legend-swatch legend-free"></i>Free</span>
+              <span><i class="legend-swatch legend-data"></i>Data</span>
+              <span><i class="legend-swatch legend-index"></i>Index</span>
+            </div>
+          </div>
+          <div id="disk-grid" class="disk-grid" aria-label="64 disk blocks"></div>
+        </section>
+
+        <section class="card" aria-labelledby="files-heading">
+          <div class="section-heading">
+            <div>
+              <h2 id="files-heading">File allocations</h2>
+              <p id="file-count">No files allocated.</p>
+            </div>
+          </div>
+          <div id="file-list" class="file-list"></div>
+        </section>
+      </section>
+    </main>
+
+    <script src="js/constants.js" defer></script>
+    <script src="js/models.js" defer></script>
+    <script src="js/allocators.js" defer></script>
+    <script src="js/simulation.js" defer></script>
+    <script src="js/ui.js" defer></script>
+    <script src="js/app.js" defer></script>
+  </body>
+</html>
