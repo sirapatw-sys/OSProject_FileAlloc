@@ -25,11 +25,11 @@
 | **TC02** | Allocation Method | สร้างไฟล์แบบ Linked | บล็อกกระจายตัวได้และเชื่อมโยงด้วยพอยน์เตอร์ | High |
 | **TC03** | Allocation Method | สร้างไฟล์แบบ Indexed | จองพื้นที่ `size + 1` บล็อก (1 Index + Data) | High |
 | **TC04** | Input Validation | ชื่อไฟล์ว่างเปล่า (Empty / Whitespace) | ปฏิเสธการสร้าง แจ้งเตือนชัดเจน | Medium |
-| **TC05** | Input Validation | ชื่อไฟล์ยาวเกิน 30 ตัวอักษร | ปฏิเสธการสร้าง แจ้งเตือนความยาวเกิน | Medium |
+| **TC05** | Input Validation | ชื่อไฟล์ยาวเกิน 30 ตัวอักษร | UI จำกัด 30 ตัวอักษร และ Core ปฏิเสธหากเกิน | Medium |
 | **TC06** | Input Validation | ชื่อไฟล์ซ้ำ (Case-insensitive) | ปฏิเสธการสร้าง ป้องกันชื่อชนกัน | High |
 | **TC07** | Input Validation | ขนาดไฟล์เป็น 0, ติดลบ, หรือทศนิยม | ปฏิเสธการสร้าง ต้องเป็นจำนวนเต็มบวก | High |
 | **TC08** | Resource Limit | การจองจนดิสก์เต็ม (Full Disk - 64 บล็อก) | จองได้พอดี 64 บล็อก และปฏิเสธการจองเพิ่ม | High |
-| **TC09** | Edge Case | ปรากฏการณ์ External Fragmentation | Contiguous ล้มเหลว แต่ Linked/Indexed จองได้ | Critical |
+| **TC09** | Edge Case | ปรากฏการณ์ External Fragmentation | Contiguous ล้มเหลว แต่ Linked และ Indexed จองได้ | Critical |
 | **TC10** | Boundary Test | จุดวิกฤติของ Indexed Allocation (63+1 vs 64+1) | ขนาด 63 จองได้ (รวม 64) ขนาด 64 ต้องถูกปฏิเสธ | High |
 | **TC11** | Lifecycle | ลบไฟล์และการคืนสภาพบล็อก (Delete) | คืนบล็อกทั้ง Data และ Index เป็น Free ครบ 100% | Critical |
 | **TC12** | Lifecycle | การรีเซ็ตระบบทั้งหมด (Reset Simulation) | ดิสก์กลับเป็น 64 Free Blocks สถานะสะอาด | Critical |
@@ -67,8 +67,8 @@
   - มีข้อความสถานะสีเขียว: `"Created “beta.log” successfully."`
   - Used Blocks เพิ่มขึ้น 5 (รวมเป็น `11`), Free Blocks ลดลงเป็น `53`
   - บน Disk Grid: มีบล็อก 5 ตำแหน่งเปลี่ยนเป็นสีของ `beta.log`
-  - รายละเอียดไฟล์แสดงสายพอยน์เตอร์: `Chain: B1 → B2 → B3 → B4 → B5 → null`
-  - ตรวจสอบ Tooltip/Aria-label: บล็อกข้อมูลแต่ละตัวแสดงหมายเลข Next Block และบล็อกสุดท้ายชี้เป็น `null`
+  - รายละเอียดไฟล์แสดงสายพอยน์เตอร์สิ้นสุดด้วย null: `Chain: B1 → B2 → B3 → B4 → B5 → null`
+  - ตรวจสอบ Tooltip/Aria-label: บล็อกข้อมูลแสดงหมายเลข Next Block ที่ชี้ไป (ส่วนบล็อกสุดท้ายของสายโซ่จะไม่แสดง pointer ต่อตามการทำงานจริงของโค้ด)
 
 ---
 
@@ -101,14 +101,22 @@
 ---
 
 ### TC05: การตรวจสอบความยาวชื่อไฟล์ (Filename Length Limit)
-* **วัตถุประสงค์**: ทดสอบการจำกัดความยาวชื่อไฟล์ไม่เกิน 30 ตัวอักษร
+* **วัตถุประสงค์**: ทดสอบการจำกัดความยาวชื่อไฟล์ไม่เกิน 30 ตัวอักษร ทั้งระดับ UI Input และ Core Simulation Validation
 * **ขั้นตอนการทดสอบ**:
-  1. ช่อง **File name**: กรอกชื่อความยาว 31 ตัวอักษร เช่น `abcdefghijklmnopqrstuvwxyz12345`
-  2. ช่อง **Size**: กรอก `1`
-  3. กดปุ่ม **Create file**
+  - **วิธีที่ 1 (ทดสอบระดับ UI)**: 
+    1. ในช่อง **File name**: พยายามพิมพ์หรือ Paste ข้อความที่มีความยาว 31 ตัวอักษรขึ้นไป เช่น `abcdefghijklmnopqrstuvwxyz12345`
+    2. สังเกตตัวอักษรที่ปรากฏในช่อง
+  - **วิธีที่ 2 (ทดสอบระดับ Core API ผ่าน Console)**: 
+    1. กดปุ่ม `F12` เพื่อเปิด Developer Tools และไปที่แท็บ **Console**
+    2. พิมพ์คำสั่ง: 
+       ```javascript
+       window.FileAlloc.app.simulation.createFile("a".repeat(31), 1, "contiguous")
+       ```
+    3. กด Enter เพื่อตรวจสอบผลลัพธ์
 * **ผลลัพธ์ที่คาดหวัง**:
-  - มีข้อความแจ้งเตือนสีแดง: `"File name must be 30 characters or fewer."`
-  - ไม่เกิดการสร้างไฟล์ และสถานะดิสก์ไม่เปลี่ยนแปลง
+  - สำหรับวิธีที่ 1 (UI): ช่อง input จะป้องกันการพิมพ์เกิน 30 ตัวอักษร โดยตัดรับเฉพาะ 30 ตัวอักษรแรก (`maxlength="30"`)
+  - สำหรับวิธีที่ 2 (Console): ระบบปฏิเสธและคืนค่า `{ success: false, message: "File name must be 30 characters or fewer." }`
+  - สถานะดิสก์ไม่เปลี่ยนแปลงในทั้งสองกรณี
 
 ---
 
@@ -153,7 +161,7 @@
 ---
 
 ### TC09: การตรวจจับ External Fragmentation (กรณีสำคัญ)
-* **วัตถุประสงค์**: พิสูจน์ว่า Contiguous ล้มเหลวเมื่อเกิด External Fragmentation ในขณะที่ Linked/Indexed ทำงานได้
+* **วัตถุประสงค์**: พิสูจน์ว่า Contiguous ล้มเหลวเมื่อเกิด External Fragmentation ในขณะที่ Linked และ Indexed ทำงานได้
 * **ขั้นตอนการทดสอบ**:
   1. กดปุ่ม **Reset simulation**
   2. สร้างไฟล์ขนาด 10 บล็อกแบบ Contiguous จำนวน 6 ไฟล์:
@@ -168,12 +176,15 @@
      *(ตอนนี้มีบล็อกว่าง: 10–19 (10 บล็อก), 30–39 (10 บล็อก), และ 60–63 (4 บล็อก) รวมบล็อกว่างทั้งสิ้น **24 บล็อก**)*
   4. ทดลองสร้างไฟล์ `f_large` ขนาด **15 บล็อก** แบบ `Contiguous Allocation`
   5. ทดลองเปลี่ยนเป็น `Linked Allocation` ด้วยขนาด **15 บล็อก** เดิมแล้วกดสร้าง
+  6. *(ทดสอบเพิ่มเติมสำหรับ Indexed)*: กด **Delete** ไฟล์ `f_large` ที่เพิ่งสร้าง จากนั้นทดลองสร้างไฟล์ชื่อ `f_indexed` ขนาด **15 บล็อก** แบบ `Indexed Allocation` (ต้องการพื้นที่ $15 + 1 = 16$ บล็อก ซึ่งพอดีกับบล็อกว่าง 24 บล็อก)
 * **ผลลัพธ์ที่คาดหวัง**:
   - ในขั้นตอนที่ 4 (Contiguous): ระบบต้องล้มเหลวและแจ้งเตือน:
     `"There are 24 free blocks, but no 15-block consecutive run."`
     *(พิสูจน์ได้ว่าแม้พื้นที่จะพอ 24 > 15 แต่เกิด External Fragmentation จึงสร้างไม่ได้)*
   - ในขั้นตอนที่ 5 (Linked): ระบบสามารถสร้างไฟล์ `f_large` ได้สำเร็จทันที โดยใช้บล็อกว่างที่กระจายอยู่
-  - ตรวจสอบ Invariant: Used Blocks กลายเป็น $40 + 15 = 55$, Free Blocks เหลือ $9$
+    - ตรวจสอบ Invariant: Used Blocks กลายเป็น $40 + 15 = 55$, Free Blocks เหลือ $9$
+  - ในขั้นตอนที่ 6 (Indexed): ระบบสามารถสร้างไฟล์ `f_indexed` ได้สำเร็จเช่นกัน โดยจัดสรร 1 Index Block และ 15 Data Blocks จากบล็อกว่างที่กระจายอยู่
+    - ตรวจสอบ Invariant: Used Blocks กลายเป็น $40 + 16 = 56$, Free Blocks เหลือ $8$
 
 ---
 
@@ -198,11 +209,18 @@
   2. จดบันทึกหมายเลขบล็อกที่เป็น Index และ Data
   3. กดปุ่ม **Delete** ที่การ์ดของไฟล์ `index_test.dat`
   4. ตรวจสอบบล็อกเหล่านั้นบน Disk Grid
+  5. เปิด Browser Console (F12) เพื่อตรวจสอบสถานะเชิงลึกของบล็อกที่ถูกคืน:
+     ```javascript
+     // ตรวจสอบบล็อกที่เป็นอดีต index หรือ data เช่น บล็อก id 10
+     window.FileAlloc.app.simulation.getState().disk.blocks[10]
+     ```
 * **ผลลัพธ์ที่คาดหวัง**:
-  - แสดงข้อความสีเขียว: `"Deleted “index_test.dat” and released its blocks."`
+  - แสดงข้อความสีเขียวบน UI: `"Deleted “index_test.dat” and released its blocks."`
   - Used Blocks กลับเป็น `0`, Free Blocks กลับเป็น `64`
-  - ทุกบล็อกที่เคยเป็นของไฟล์นี้กลับมามีคลาสสถานะเป็น Free
-  - `fileId`, `role` ("index"/"data") และ `nextBlockId` ต้องถูกเคลียร์เป็น `null` ทั้งหมด
+  - ทุกบล็อกที่เคยเป็นของไฟล์นี้กลับมามีคลาสสถานะเป็น Free บนหน้าเว็บ
+  - ตรวจสอบใน Console: บล็อกดังกล่าวต้องถูกรีเซ็ตค่าเป็น:
+    `{ id: 10, status: "free", fileId: null, role: null, nextBlockId: null }`
+    (`fileId`, `role` และ `nextBlockId` ต้องถูกเคลียร์เป็น `null` ทั้งหมด)
 
 ---
 

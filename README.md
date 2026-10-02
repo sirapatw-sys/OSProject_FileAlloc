@@ -25,14 +25,14 @@ This project has **zero external dependencies**, no backend, and requires **no b
 
 ## 📖 Project Documentation (สารบัญเอกสาร)
 
-Comprehensive documentation for developers, testers, and presenters is organized in the [`docs/`](file:///c:/Users/ADMIN/Documents/GitHub/OSProject_FileAlloc/docs) directory:
+Comprehensive documentation for developers, testers, and presenters is organized in the [`docs/`](docs/) directory:
 
 | Document | Description | Target Audience |
 | :--- | :--- | :--- |
-| 📘 [**docs/requirements.md**](file:///c:/Users/ADMIN/Documents/GitHub/OSProject_FileAlloc/docs/requirements.md) | **System Requirements Specification (SRS)**: Data structures, allocation rules, validation criteria, and invariant definitions | Developers & Architects |
-| 🧪 [**docs/test-cases.md**](file:///c:/Users/ADMIN/Documents/GitHub/OSProject_FileAlloc/docs/test-cases.md) | **Test Cases & Verification Suite**: 12 detailed manual test scenarios (TC01–TC12), edge cases, and bug report templates | Quality Assurance & Testers |
-| 🎤 [**docs/demo-script.md**](file:///c:/Users/ADMIN/Documents/GitHub/OSProject_FileAlloc/docs/demo-script.md) | **Presentation & Demo Script**: 5–7 minute live presentation guide with cue sheet, Thai script, and anticipated Q&A | Presenters & Instructors |
-| 📋 [**NEXT_STEPS_TH.md**](file:///c:/Users/ADMIN/Documents/GitHub/OSProject_FileAlloc/NEXT_STEPS_TH.md) | **Team Workflow Guide (ภาษาไทย)**: Roadmap, team role boundaries, and branch guidelines | Team Members |
+| 📘 [**docs/requirements.md**](docs/requirements.md) | **System Requirements Specification (SRS)**: Data structures, allocation rules, validation criteria, and invariant definitions | Developers & Architects |
+| 🧪 [**docs/test-cases.md**](docs/test-cases.md) | **Test Cases & Verification Suite**: 12 detailed manual test scenarios (TC01–TC12), edge cases, and bug report templates | Quality Assurance & Testers |
+| 🎤 [**docs/demo-script.md**](docs/demo-script.md) | **Presentation & Demo Script**: 5–7 minute live presentation guide with cue sheet, Thai script, and anticipated Q&A | Presenters & Instructors |
+| 📋 [**NEXT_STEPS_TH.md**](NEXT_STEPS_TH.md) | **Team Workflow Guide (ภาษาไทย)**: Roadmap, team role boundaries, and branch guidelines | Team Members |
 
 ---
 
@@ -109,12 +109,16 @@ OSProject_FileAlloc/
 Other components interact with the simulation state through public methods on `window.FileAlloc.Simulation`:
 
 ```javascript
-simulation.createFile(name, size, allocationType) // => { success, file, message } | { success: false, errorCode, message }
-simulation.deleteFile(fileId)                     // => { success, file, message }
-simulation.reset()                                // => { success, message }
-simulation.selectFile(fileId)                     // => toggles highlight state
-simulation.getState()                             // => { disk, files, selectedFileId, usedBlocks, freeBlocks }
-simulation.subscribe(listener)                    // => registers reactive UI update callback
+simulation.createFile(name, size, allocationType) 
+// => { success: true, file, message } | { success: false, message, errorCode? }
+// Note: errorCode (e.g. "EXTERNAL_FRAGMENTATION", "INSUFFICIENT_SPACE") is included when 
+// allocation fails; input validation errors return { success: false, message } without errorCode.
+
+simulation.deleteFile(fileId) // => { success, file, message }
+simulation.reset()            // => { success, message }
+simulation.selectFile(fileId) // => toggles highlight state
+simulation.getState()         // => { disk, files, selectedFileId, usedBlocks, freeBlocks }
+simulation.subscribe(listener)// => registers reactive UI update callback
 ```
 
 ### Stable DOM Element IDs
