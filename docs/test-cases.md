@@ -206,21 +206,29 @@
 * **วัตถุประสงค์**: ยืนยันว่าการลบไฟล์คืนบล็อกทั้งหมด (ทั้ง Data และ Index) และล้างพอยน์เตอร์เกลี้ยง
 * **ขั้นตอนการทดสอบ**:
   1. สร้างไฟล์ `index_test.dat` ขนาด 5 แบบ `Indexed Allocation` (ใช้ 6 บล็อก)
-  2. จดบันทึกหมายเลขบล็อกที่เป็น Index และ Data
+  2. จดบันทึกหมายเลขบล็อกที่เป็น Index Block และ Data Blocks จากการ์ดรายละเอียดไฟล์ (เช่น บล็อก $B_{index}$ และ $B_{data}$)
   3. กดปุ่ม **Delete** ที่การ์ดของไฟล์ `index_test.dat`
   4. ตรวจสอบบล็อกเหล่านั้นบน Disk Grid
   5. เปิด Browser Console (F12) เพื่อตรวจสอบสถานะเชิงลึกของบล็อกที่ถูกคืน:
      ```javascript
-     // ตรวจสอบบล็อกที่เป็นอดีต index หรือ data เช่น บล็อก id 10
-     window.FileAlloc.app.simulation.getState().disk.blocks[10]
+     // แทนที่ BLOCK_ID ด้วยหมายเลข Index Block หรือ Data Block ที่จดบันทึกไว้ในขั้นตอนที่ 2
+     window.FileAlloc.app.simulation.getState().disk.blocks[BLOCK_ID]
      ```
 * **ผลลัพธ์ที่คาดหวัง**:
   - แสดงข้อความสีเขียวบน UI: `"Deleted “index_test.dat” and released its blocks."`
   - Used Blocks กลับเป็น `0`, Free Blocks กลับเป็น `64`
   - ทุกบล็อกที่เคยเป็นของไฟล์นี้กลับมามีคลาสสถานะเป็น Free บนหน้าเว็บ
-  - ตรวจสอบใน Console: บล็อกดังกล่าวต้องถูกรีเซ็ตค่าเป็น:
-    `{ id: 10, status: "free", fileId: null, role: null, nextBlockId: null }`
-    (`fileId`, `role` และ `nextBlockId` ต้องถูกเคลียร์เป็น `null` ทั้งหมด)
+  - ตรวจสอบใน Console: บล็อกตามหมายเลข `BLOCK_ID` ที่เคยเป็นของไฟล์นี้ จะต้องถูกรีเซ็ตค่ากลับเป็น:
+    ```javascript
+    {
+      id: BLOCK_ID,
+      status: "free",
+      fileId: null,
+      role: null,
+      nextBlockId: null
+    }
+    ```
+    (ยืนยันว่า `fileId`, `role` และ `nextBlockId` ถูกเคลียร์กลับเป็น `null` ทั้งหมดอย่างแท้จริง ไม่หลงเหลือข้อมูลเดิม)
 
 ---
 
