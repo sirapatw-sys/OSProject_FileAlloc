@@ -40,7 +40,7 @@
 **การกระทำบนหน้าจอ:**
 1. กรอก File name: `kernel.bin`
 2. กรอก Size: `6`
-3. เลือก Allocation method: `Contiguous Allocation`
+3. เลือก Allocation method: การ์ด `Contiguous`
 4. กดปุ่ม **Create file**
 
 **บทพูดผู้พรีเซนต์:**
@@ -51,7 +51,7 @@
 **การกระทำบนหน้าจอ:**
 1. กรอก File name: `music.mp3`
 2. กรอก Size: `5`
-3. เลือก Allocation method: `Linked Allocation`
+3. เลือก Allocation method: การ์ด `Linked`
 4. กดปุ่ม **Create file**
 5. เลื่อนเมาส์ชี้ดูการ์ดไฟล์และสายโซ่บล็อก
 
@@ -63,7 +63,7 @@
 **การกระทำบนหน้าจอ:**
 1. กรอก File name: `database.db`
 2. กรอก Size: `4`
-3. เลือก Allocation method: `Indexed Allocation`
+3. เลือก Allocation method: การ์ด `Indexed`
 4. กดปุ่ม **Create file**
 5. ชี้ให้เห็น Index Block และตัวเลขสรุปบน Summary Cards
 
@@ -93,7 +93,7 @@
    *(ตอนนี้มี Free Blocks รวมกันถึง **34 บล็อก** แต่ช่องว่างที่ใหญ่ที่สุดมีขนาดเพียง 14 บล็อก)*
 5. ในฟอร์ม: พยายามสร้าง `huge.zip` ขนาด **15 บล็อก** แบบ `Contiguous Allocation` -> กด **Create file**
    *(ระบบจะปฏิเสธและขึ้นข้อความสีแดงเตือน External Fragmentation)*
-6. เปลี่ยน Allocation method เป็น `Linked Allocation` ด้วยขนาด **15 บล็อก** เท่าเดิม -> กด **Create file**
+6. เปลี่ยน Allocation method ไปเลือกการ์ด `Linked` ด้วยขนาด **15 บล็อก** เท่าเดิม -> กด **Create file**
    *(ระบบสร้างไฟล์สำเร็จทันที!)*
 
 **บทพูดผู้พรีเซนต์:**
