@@ -44,13 +44,15 @@
 * **ขั้นตอนการทดสอบ (Test Steps)**:
   1. ในช่อง **File name** พิมพ์ `alpha.bin`
   2. ในช่อง **Size (data blocks)** กรอก `6`
-  3. ในช่อง **Allocation method** เลือก `Contiguous Allocation`
+  3. ในกลุ่ม **Allocation method** คลิกเลือกการ์ด `Contiguous`
   4. กดปุ่ม **Create file**
 * **ผลลัพธ์ที่คาดหวัง (Expected Results)**:
   - มีข้อความสถานะสีเขียว: `"Created “alpha.bin” successfully."`
   - Used Blocks เปลี่ยนเป็น `6`, Free Blocks เปลี่ยนเป็น `58`
   - บน Disk Grid: บล็อก ID `0` ถึง `5` กลายเป็นสีของไฟล์ `alpha.bin`
-  - ในรายการ File Allocations แสดงรายละเอียด: `Start: 0 · Length: 6 · Blocks: 0, 1, 2, 3, 4, 5`
+  - ในรายการ File Allocations การ์ดของ `alpha.bin` แสดง:
+    - ข้อความรายละเอียด: `Start block 0 · Length 6`
+    - Block chips เรียงตามลำดับ: `0` `1` `2` `3` `4` `5`
   - ตรวจสอบ Invariant: $6 + 58 = 64$
 
 ---
@@ -61,13 +63,15 @@
 * **ขั้นตอนการทดสอบ**:
   1. กรอก **File name**: `beta.log`
   2. กรอก **Size**: `5`
-  3. เลือก **Allocation method**: `Linked Allocation`
+  3. เลือก **Allocation method**: การ์ด `Linked`
   4. กดปุ่ม **Create file**
 * **ผลลัพธ์ที่คาดหวัง**:
   - มีข้อความสถานะสีเขียว: `"Created “beta.log” successfully."`
   - Used Blocks เพิ่มขึ้น 5 (รวมเป็น `11`), Free Blocks ลดลงเป็น `53`
   - บน Disk Grid: มีบล็อก 5 ตำแหน่งเปลี่ยนเป็นสีของ `beta.log`
-  - รายละเอียดไฟล์แสดงสายพอยน์เตอร์สิ้นสุดด้วย null: `Chain: B1 → B2 → B3 → B4 → B5 → null`
+  - การ์ดของ `beta.log` แสดง:
+    - ข้อความรายละเอียด: `Start block B1 · End block B5`
+    - Block chips เป็นสายพอยน์เตอร์ที่สิ้นสุดด้วย chip `null`: `B1` → `B2` → `B3` → `B4` → `B5` → `null`
   - ตรวจสอบ Tooltip/Aria-label: บล็อกข้อมูลแสดงหมายเลข Next Block ที่ชี้ไป (ส่วนบล็อกสุดท้ายของสายโซ่จะไม่แสดง pointer ต่อตามการทำงานจริงของโค้ด)
 
 ---
@@ -78,13 +82,16 @@
 * **ขั้นตอนการทดสอบ**:
   1. กรอก **File name**: `gamma.dat`
   2. กรอก **Size**: `4` (ต้องการ 4 Data Blocks)
-  3. เลือก **Allocation method**: `Indexed Allocation`
+  3. เลือก **Allocation method**: การ์ด `Indexed`
   4. กดปุ่ม **Create file**
 * **ผลลัพธ์ที่คาดหวัง**:
   - มีข้อความสถานะสีเขียว: `"Created “gamma.dat” successfully."`
   - Used Blocks เพิ่มขึ้น **5 บล็อก** (4 Data + 1 Index) เป็น `16`, Free Blocks เหลือ `48`
   - บน Disk Grid: ปรากฏ 1 บล็อกที่เป็น **Index Block** (มีสไตล์/ขอบ/สัญลักษณ์ Index ชัดเจน) และอีก 4 บล็อกเป็น **Data Blocks**
-  - รายละเอียดไฟล์แสดง: `Index: <indexBlockId> · Data: <b1>, <b2>, <b3>, <b4>`
+  - การ์ดของ `gamma.dat` แสดง:
+    - ข้อมูลขนาด: `4 data blocks + 1 index block · 5 blocks on disk`
+    - ข้อความรายละเอียด: `Index block <indexBlockId> points to 4 data blocks`
+    - Block chips: chip ของ Index Block (สไตล์ Index) ตามด้วย `→` และ chip ของ Data Blocks: `<indexBlockId>` → `<b1>` `<b2>` `<b3>` `<b4>`
 
 ---
 
@@ -175,7 +182,7 @@
   3. สั่ง **Delete** ไฟล์ `f2` และ `f4`
      *(ตอนนี้มีบล็อกว่าง: 10–19 (10 บล็อก), 30–39 (10 บล็อก), และ 60–63 (4 บล็อก) รวมบล็อกว่างทั้งสิ้น **24 บล็อก**)*
   4. ทดลองสร้างไฟล์ `f_large` ขนาด **15 บล็อก** แบบ `Contiguous Allocation`
-  5. ทดลองเปลี่ยนเป็น `Linked Allocation` ด้วยขนาด **15 บล็อก** เดิมแล้วกดสร้าง
+  5. ทดลองเปลี่ยนไปเลือกการ์ด `Linked` ด้วยขนาด **15 บล็อก** เดิมแล้วกดสร้าง
   6. *(ทดสอบเพิ่มเติมสำหรับ Indexed)*: กด **Delete** ไฟล์ `f_large` ที่เพิ่งสร้าง จากนั้นทดลองสร้างไฟล์ชื่อ `f_indexed` ขนาด **15 บล็อก** แบบ `Indexed Allocation` (ต้องการพื้นที่ $15 + 1 = 16$ บล็อก ซึ่งพอดีกับบล็อกว่าง 24 บล็อก)
 * **ผลลัพธ์ที่คาดหวัง**:
   - ในขั้นตอนที่ 4 (Contiguous): ระบบต้องล้มเหลวและแจ้งเตือน:
@@ -236,7 +243,7 @@
 * **วัตถุประสงค์**: ทดสอบการกลับคืนสู่สถานะเริ่มต้นของการจำลองทั้งหมด
 * **ขั้นตอนการทดสอบ**:
   1. สร้างไฟล์หลายๆ แบบ (Contiguous, Linked, Indexed) จนดิสก์มีข้อมูลบางส่วน
-  2. คลิกเลือกไฟล์หนึ่งไฟล์เพื่อให้มีสถานะ Selected
+  2. คลิกการ์ดไฟล์หนึ่งไฟล์เพื่อ Highlight บล็อกของไฟล์นั้น
   3. กดปุ่ม **Reset simulation** ที่มุมขวาบน
   4. กด **OK** บนกล่องข้อความยืนยัน (`confirm dialog`)
 * **ผลลัพธ์ที่คาดหวัง**:
@@ -258,7 +265,7 @@
 | **Free Block Cleanliness** | บล็อก Free ต้องไม่มีข้อมูลหลงเหลือ | ตรวจสอบว่าไม่มี Label ชื่อไฟล์ หรือพอยน์เตอร์ชี้ไปบล็อกอื่น |
 | **Atomic Operation** | Error ต้องไม่ทำให้ดิสก์เปลี่ยน | เมื่อสร้างไม่สำเร็จ ตรวจสอบว่า Used Blocks ต้องเท่าเดิม 100% |
 | **Index Overhead** | Indexed ใช้มากกว่าขนาดไฟล์ 1 เสมอ | ตรวจสอบว่า Used Blocks เพิ่มขึ้นเท่ากับ `size + 1` |
-| **Chain Validity** | ห่วงโซ่ Linked สิ้นสุดด้วย null | รายละเอียดไฟล์ต้องแสดง `→ null` และไม่มี Loop บนดิสก์ |
+| **Chain Validity** | ห่วงโซ่ Linked สิ้นสุดด้วย null | Block chips ของไฟล์ Linked ต้องจบด้วย chip `null` และไม่มี Loop บนดิสก์ |
 
 ---
 
